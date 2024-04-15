@@ -1,11 +1,13 @@
 class Graph {
   constructor() {
+    this.visited = {};
 		this.adjacencyList = {};
   }
 
   // Adiciona um nó ao grafo
   addNode(node) {
-    if (!this.adjacencyList[node]) {
+    if (!this.adjacencyList[node] && !this.visited[node]) {
+      this.visited[node] = false;
       this.adjacencyList[node] = [];
     }
   }
@@ -14,6 +16,11 @@ class Graph {
   addConnection(node1, node2) {
     this.adjacencyList[node1].push(node2);
     this.adjacencyList[node2].push(node1);
+  }
+
+  // Visita um nó
+  visitNode(node) {
+    this.visited[node] = true;
   }
 
   // Remove uma aresta entre dois nós

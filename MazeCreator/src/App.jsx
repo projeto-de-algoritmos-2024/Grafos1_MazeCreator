@@ -6,19 +6,18 @@ function App() {
   const baseGraph = new Graph();
 
   /* ------ Cria um grafo para representar o labirinto ------ */
-  let mazeGraph = new Graph();
+  const mazeGraph = new Graph();
 
   /* ------ Cria arrays auxiliares para contar os elementos do array ------ */
   const auxElementArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const auxRowArray = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
 
-
   /* ------ Adiciona os nós ao grafo, sendo representados por números de [0 a 99] ------ */
   for (let i = 0; i < 100; i++) {
     baseGraph.addNode(i);
+    mazeGraph.addNode(i);
   }
 
-  
   /* ------ Realiza as conexões com os nós vizinhos no labirinto ------ */
   for (let i = 0; i < 100; i++) {
     /* ------------------ Conexão com o nó de baixo ------------------ */
@@ -44,10 +43,10 @@ function App() {
     /* ------------------------------------------------------------------ */
 
     /* ------------------ Conexão com o nó da direita ------------------ */
-    // Verifica se não é o último elemento
-    // Verifica se não está na borda esquerda do labirinto
-    // Verifica se não há uma conexão existente entre os nós
-    // Conecta o nó com o da direita
+    // 1. Verifica se não é o último elemento
+    // 2. Verifica se não está na borda esquerda do labirinto
+    // 3. Verifica se não há uma conexão existente entre os nós
+    // 4. Conecta o nó com o da direita
     if (i !== 99) {
       if ((i + 1) % 10 !== 0) {
         if (!baseGraph.searchConnection(i, i + 1)) {
@@ -59,10 +58,45 @@ function App() {
   }
 
   /* -------------- Cria o labirinto utilizando uma DFS randomizada -------------- */
+  // Função para pegar um nó aleatório da lista de adjacencia
+  const randomNodeCreator = (max) => {
+    let randomIndex = Math.floor(Math.random() * max);
+
+    return randomIndex;
+  };
+
+  // Para todos os nós adjacentes ao nó recebido,
+  // verifica se já foi visitado e, se não, adiciona
+  // uma aresta entre ele e o nó visitado e chama a função recursivamente
+  const depthFirstSearch = (node) => {
+    let maxLength = baseGraph.adjacencyList[node].length;
+    mazeGraph.visitNode(node);
+    for (let i = 0; i < maxLength; i++) {
+      let randomNode = randomNodeCreator(baseGraph.adjacencyList[node].length);
+
+      // Define o próximo nó
+      let nextNode = baseGraph.adjacencyList[node][randomNode];
+      if (!mazeGraph.visited[nextNode]) {
+        baseGraph.removeConnection(node, nextNode);
+        mazeGraph.addConnection(node, nextNode);
+        depthFirstSearch(nextNode);
+      }
+    }
+  };
+
   const handleCreateMaze = () => {
-    mazeGraph = baseGraph;
+    // Para todo nó do grafo,
+    // verifica se já foi visitado e,
+    // se não, chama a função recursivamente
+    for (let i = 0; i < 100; i++) {
+      if (!mazeGraph.visited[i]) {
+        depthFirstSearch(i);
+      }
+    }
   };
   /* ----------------------------------------------------------------------------- */
+
+  handleCreateMaze();
 
   return (
     <div className="pageContainer">
@@ -79,7 +113,7 @@ function App() {
 
                 if (rowNumber !== 0) {
                   if (
-                    baseGraph.searchConnection(
+                    mazeGraph.searchConnection(
                       rowNumber + elementNumber,
                       rowNumber + elementNumber - 10
                     )
@@ -90,7 +124,7 @@ function App() {
 
                 if (elementNumber !== 0) {
                   if (
-                    baseGraph.searchConnection(
+                    mazeGraph.searchConnection(
                       rowNumber + elementNumber,
                       rowNumber + elementNumber - 1
                     )
@@ -101,7 +135,7 @@ function App() {
 
                 if (elementNumber !== 9) {
                   if (
-                    baseGraph.searchConnection(
+                    mazeGraph.searchConnection(
                       rowNumber + elementNumber,
                       rowNumber + elementNumber + 1
                     )
@@ -112,7 +146,7 @@ function App() {
 
                 if (rowNumber !== 90) {
                   if (
-                    baseGraph.searchConnection(
+                    mazeGraph.searchConnection(
                       rowNumber + elementNumber,
                       rowNumber + elementNumber + 10
                     )
@@ -131,91 +165,92 @@ function App() {
                       rigthConnection &&
                       downConnection
                         ? {
-                            borderStyle: "hidden",
+                            border: "2px solid white",
                           }
                         : upConnection && leftConnection && rigthConnection
                         ? {
-                            borderTopStyle: "hidden",
-                            borderLeftStyle: "hidden",
-                            borderRightStyle: "hidden",
+                            borderTop: "2px solid white",
+                            borderLeft: "2px solid white",
+                            borderRight: "2px solid white",
                           }
                         : upConnection && leftConnection && downConnection
                         ? {
-                            borderTopStyle: "hidden",
-                            borderLeftStyle: "hidden",
-                            borderBottomStyle: "hidden",
+                            borderTop: "2px solid white",
+                            borderLeft: "2px solid white",
+                            borderBottom: "2px solid white",
                           }
                         : leftConnection && downConnection && rigthConnection
                         ? {
-                            borderLeftStyle: "hidden",
-                            borderBottomStyle: "hidden",
-                            borderRightStyle: "hidden",
+                            borderLeft: "2px solid white",
+                            borderBottom: "2px solid white",
+                            borderRight: "2px solid white",
                           }
                         : downConnection && rigthConnection && upConnection
                         ? {
-                            borderBottomStyle: "hidden",
-                            borderRightStyle: "hidden",
-                            borderTopStyle: "hidden",
+                            borderBottom: "2px solid white",
+                            borderRight: "2px solid white",
+                            borderTop: "2px solid white",
                           }
                         : upConnection && downConnection
                         ? {
-                            borderTopStyle: "hidden",
-                            borderBottomStyle: "hidden",
+                            borderTop: "2px solid white",
+                            borderBottom: "2px solid white",
                           }
                         : upConnection && leftConnection
                         ? {
-                            borderTopStyle: "hidden",
-                            borderLeftStyle: "hidden",
+                            borderTop: "2px solid white",
+                            borderLeft: "2px solid white",
                           }
                         : upConnection && rigthConnection
                         ? {
-                            borderTopStyle: "hidden",
-                            borderRightStyle: "hidden",
+                            borderTop: "2px solid white",
+                            borderRight: "2px solid white",
                           }
                         : leftConnection && rigthConnection
                         ? {
-                            borderLeftStyle: "hidden",
-                            borderRightStyle: "hidden",
+                            borderLeft: "2px solid white",
+                            borderRight: "2px solid white",
                           }
                         : leftConnection && downConnection
                         ? {
-                            borderLeftStyle: "hidden",
-                            borderBottomStyle: "hidden",
+                            borderLeft: "2px solid white",
+                            borderBottom: "2px solid white",
                           }
                         : rigthConnection && downConnection
                         ? {
-                            borderRightStyle: "hidden",
-                            borderBottomStyle: "hidden",
+                            borderRight: "2px solid white",
+                            borderBottom: "2px solid white",
                           }
                         : upConnection
                         ? {
-                            borderTopStyle: "hidden",
+                            borderTop: "2px solid white",
                           }
                         : leftConnection
                         ? {
-                            borderLeftStyle: "hidden",
+                            borderLeft: "2px solid white",
                           }
                         : rigthConnection
                         ? {
-                            borderRightStyle: "hidden",
+                            borderRight: "2px solid white",
                           }
                         : downConnection
                         ? {
-                            borderBottomStyle: "hidden",
+                            borderBottom: "2px solid white",
                           }
                         : {}
                     }
-                  >
-                    {rowNumber + elementNumber}
-                  </div>
+                  />
                 );
               })}
             </div>
           );
         })}
       </div>
-      <button className="createMazeButton" onClick={() => handleCreateMaze()}>
-        Criar labirinto
+      <button
+        className="createMazeButton"
+        onClick={() => window.location.reload()}
+      >
+        Gerar novo labirinto
       </button>
     </div>
   );
